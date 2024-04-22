@@ -68,6 +68,7 @@ public class SpeckleRhinoConnectorPlugin : PlugIn
 
     RhinoDoc.BeginOpenDocument += RhinoDoc_BeginOpenDocument;
     RhinoDoc.EndOpenDocument += RhinoDoc_EndOpenDocument;
+    RhinoApp.Initialized += RhinoAppOnInitialized;
 
     //Mapping tool selection
     RhinoDoc.ActiveDocumentChanged += RhinoDoc_ActiveDocumentChanged;
@@ -76,6 +77,13 @@ public class SpeckleRhinoConnectorPlugin : PlugIn
     RhinoDoc.DeselectAllObjects += (sender, e) => SelectionExpired = true;
     RhinoDoc.DeleteRhinoObject += (sender, e) => ExistingSchemaLogExpired = true;
     RhinoApp.Idle += RhinoApp_Idle;
+    
+    var thread = new System.Threading.Thread(LoadAndRegisterChimera) { Name = "Registering thread" };
+  }
+
+  private void RhinoAppOnInitialized(object sender, EventArgs e)
+  {
+    _rhinoDone = true;
   }
 
   public static void InitAvaloniaMac()
@@ -160,6 +168,7 @@ public class SpeckleRhinoConnectorPlugin : PlugIn
 
   private void RhinoDoc_BeginOpenDocument(object sender, DocumentOpenEventArgs e)
   {
+    InitChimera();
     if (e.Merge) // this is a paste or import event
     {
       // get existing streams in doc before a paste or import operation to use for cleanup
@@ -356,4 +365,33 @@ public class SpeckleRhinoConnectorPlugin : PlugIn
     SelectionExpired = true;
     // TODO: Parse new doc for existing stuff
   }
+  
+  #region ChimeraLoad
+  private static readonly Guid s_chimeraGuid = new("9a6f1ba1-decd-41ae-b42c-80f615152e78");
+  private bool _rhinoDone = false;
+  private bool _chimeraLoaded = false;
+
+  private void LoadAndRegisterChimera()
+  {
+    while (!_rhinoDone)
+      System.Threading.Thread.Sleep(10);
+    //make sure ChimeraTransport Has been Loaded
+    InitChimera();
+  }
+
+  private void InitChimera()
+  {
+    if(_chimeraLoaded) return;
+    _chimeraLoaded = true;
+    var plugin = Find(s_chimeraGuid);
+    if (plugin == null)
+    {
+      if (LoadPlugIn(s_chimeraGuid))
+        plugin = Find(s_chimeraGuid);
+      else
+        return;
+    }
+  }
+
+  #endregion
 }
