@@ -617,6 +617,14 @@ public partial class ConnectorBindingsRhino : ConnectorBindings
           {
             appObj.Update(id.ToString());
           }
+#if CHIMERA
+          if (obj[ConnectorRhinoShared.ChimeraTransport.SpeckleChimeraAdapter.CHIMERA_KEY] is Base chimeraSpeckleObject)
+          {
+            var ro = Doc.Objects.FindId(id);
+            var cuo = Chimera.DataAccess.ChimeraDataReader.AddChimeraUserObjectToRhinoObject(ro);
+            ConnectorRhinoShared.ChimeraTransport.SpeckleChimeraAdapter.ParseSpeckleToChimera(chimeraSpeckleObject,cuo,converter);
+          }
+#endif
 
           bakedCount++;
 

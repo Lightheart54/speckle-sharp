@@ -89,6 +89,15 @@ public partial class ConnectorBindingsRhino : ConnectorBindings
             }
 
             converted = converter.ConvertToSpeckle(o);
+            #if CHIMERA
+            var cuo = Chimera.DataAccess.ChimeraDataReader.GetChimeraUserObjectFromObject(o);
+            if (cuo is not null)
+            {
+              var chimeraSpeckleObject = ConnectorRhinoShared.ChimeraTransport.SpeckleChimeraAdapter.ChimeraToSpeckle(cuo, converter);
+              converted[ConnectorRhinoShared.ChimeraTransport.SpeckleChimeraAdapter.CHIMERA_KEY] = chimeraSpeckleObject;
+            }
+              
+            #endif
 
             if (converted != null)
             {
