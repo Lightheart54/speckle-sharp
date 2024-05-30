@@ -14,7 +14,6 @@ namespace ConnectorRhinoShared.ChimeraTransport;
 public static class SpeckleChimeraAdapter
 {
   private const string CHIMERA_OBJECT_ID_KEY = "ChimeraId";
-  private const string CHIMERA_VALUE_KEY = "ChimeraValue";
   public const string CHIMERA_KEY = "Chimera";
   
   public static Base ChimeraToSpeckle(Chimera.DataAccess.IChimeraUserData cuo, ISpeckleConverter converter)
@@ -70,7 +69,6 @@ public static class SpeckleChimeraAdapter
     {
       if(string.Equals(propPair.Key, CHIMERA_OBJECT_ID_KEY, StringComparison.InvariantCultureIgnoreCase)) continue;
       if(propPair.Value is not Base dataObject) continue;
-      var defIdObject = dataObject[CHIMERA_OBJECT_ID_KEY];
       var attrId = Guid.Parse(dataObject[CHIMERA_OBJECT_ID_KEY] as string ?? string.Empty);
       if (attrId == Guid.Empty) continue;
       var def = SpeciesManager.GetAttribute(attrId);
